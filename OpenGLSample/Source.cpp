@@ -34,7 +34,7 @@ using namespace std; // Standard namespace
 // Unnamed namespace
 namespace
 {
-    const char* const WINDOW_TITLE = "Gino Murin - Textured Pyramid"; // Macro for window title
+    const char* const WINDOW_TITLE = "Gino Murin - Lighting Demo"; // Macro for window title
 
     // Variables for window width and height
     const int WINDOW_WIDTH = 800;
@@ -51,9 +51,9 @@ namespace
     // Main GLFW window
     GLFWwindow* gWindow = nullptr;
     // Triangle mesh data
-    GLMesh gMesh;
+    GLMesh gMesh, lightMesh;
     // Texture
-    GLuint gTextureId;
+    GLuint gTextureId, gLampProgramId;
     glm::vec2 gUVScale(5.0f, 5.0f);
     GLint gTexWrapMode = GL_REPEAT;
 
@@ -69,7 +69,14 @@ namespace
     // timing
     float gDeltaTime = 0.0f; // time between current frame and last frame
     float gLastFrame = 0.0f;
+    // Cube and light color
+    //m::vec3 gObjectColor(0.6f, 0.5f, 0.75f);
+    glm::vec3 gObjectColor(1.f, 0.2f, 0.0f);
+    glm::vec3 gLightColor(1.0f, 1.0f, 1.0f);
 
+    // Light position and scale
+    glm::vec3 gLightPosition(1.5f, 0.5f, 3.0f);
+    glm::vec3 gLightScale(0.3f);
 }
 
 /* User-defined Function prototypes to:
@@ -92,7 +99,7 @@ bool UCreateShaderProgram(const char* vtxShaderSource, const char* fragShaderSou
 void UDestroyShaderProgram(GLuint programId);
 
 
-/* Vertex Shader Source Code*/
+/*Pyramid Vertex Shader Source Code*/
 const GLchar* vertexShaderSource = GLSL(440,
     layout(location = 0) in vec3 position;
 layout(location = 2) in vec2 textureCoordinate;
@@ -113,7 +120,7 @@ void main()
 );
 
 
-/* Fragment Shader Source Code*/
+/* Pyramid Fragment Shader Source Code*/
 const GLchar* fragmentShaderSource = GLSL(440,
     in vec2 vertexTextureCoordinate;
 
@@ -128,6 +135,34 @@ void main()
 }
 );
 
+
+/* Lamp Shader Source Code*/
+const GLchar* lampVertexShaderSource = GLSL(440,
+
+    layout(location = 0) in vec3 position; // VAP position 0 for vertex position data
+
+        //Uniform / Global variables for the  transform matrices
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(position, 1.0f); // Transforms vertices into clip coordinates
+}
+);
+
+
+/* Fragment Shader Source Code*/
+const GLchar* lampFragmentShaderSource = GLSL(440,
+
+    out vec4 fragmentColor; // For outgoing lamp color (smaller cube) to the GPU
+
+void main()
+{
+    fragmentColor = vec4(1.0f); // Set color to white (1.0f,1.0f,1.0f) with alpha 1.0
+}
+);
 
 // Images are loaded with Y axis going down, but OpenGL's Y axis goes up, so let's flip it
 void flipImageVertically(unsigned char* image, int width, int height, int channels)
@@ -156,7 +191,7 @@ int main(int argc, char* argv[])
 
     // Create the mesh
     UCreateMesh(gMesh); // Calls the function to create the Vertex Buffer Object
-
+    UCreateLight(lightMesh);
     // Create the shader program
     if (!UCreateShaderProgram(vertexShaderSource, fragmentShaderSource, gProgramId))
         return EXIT_FAILURE;
@@ -470,6 +505,57 @@ void URender()
     glfwSwapBuffers(gWindow);    // Flips the the back buffer with the front buffer every frame.
 }
 
+
+// Implements the UCreateMesh function
+void UCreateLight(GLMesh& lightMesh)
+{
+
+
+    // Position and UV data for pyramid
+    GLfloat verts[] = {
+        //Vertices            //UV
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+        -0.5f, 0.5f, 0.0f,    0.0f, 1.0f,
+        0.5f, -0.5f, 0.0f,    1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f,     1.0f, 1.0f,
+        -0.5f, 0.5f, 0.0f,    0.0f, 1.0f,
+        0.5f, -0.5f, 0.0f,    1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,     0.5f, 0.5f,
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f,    1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,     0.5f, 0.5f,
+        0.5f, -0.5f, 0.0f,    0.0f, 0.0f,
+        0.5f, 0.5f, 0.0f,     1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,     0.5f, 0.5f,
+        0.5f, 0.5f, 0.0f,     0.0f, 0.0f,
+        -0.5f, 0.5f, 0.0f,    1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,     0.5f, 0.5f,
+        -0.5f, 0.5f, 0.0f,    0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
+    };
+    const GLuint floatsPerVertex = 3;
+    const GLuint floatsPerUV = 2;
+
+    lightMesh.nVertices = sizeof(verts) / (sizeof(verts[0]) * (floatsPerVertex + floatsPerUV));
+
+    glGenVertexArrays(1, &lightMesh.vao); // we can also generate multiple VAOs or buffers at the same time
+    glBindVertexArray(lightMesh.vao);
+
+    // Create VBO
+    glGenBuffers(1, &lightMesh.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, lightMesh.vbo); // Activates the buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW); // Sends vertex or coordinate data to the GPU
+
+    // Strides between vertex coordinates
+    GLint stride = sizeof(float) * (floatsPerVertex + floatsPerUV);
+
+    // Create Vertex Attribute Pointers
+    glVertexAttribPointer(0, floatsPerVertex, GL_FLOAT, GL_FALSE, stride, 0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(2, floatsPerUV, GL_FLOAT, GL_FALSE, stride, (void*)(sizeof(float) * floatsPerVertex));
+    glEnableVertexAttribArray(2);
+}
 
 // Implements the UCreateMesh function
 void UCreateMesh(GLMesh& mesh)
