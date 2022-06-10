@@ -1,4 +1,5 @@
-﻿/* Gino Murin - Module 6 Assignment
+﻿/* 
+* Gino Murin - Module 6 Assignment
 * The following code expands on previous modules by implementing
 * the following changes:
 * 
@@ -31,7 +32,7 @@ using namespace std; // Standard namespace
 // Unnamed namespace
 namespace
 {
-    const char* const WINDOW_TITLE = "Tutorial 6.3"; // Macro for window title
+    const char* const WINDOW_TITLE = "Gino Murin - Module 6 Assignment"; // Macro for window title
 
     // Variables for window width and height
     const int WINDOW_WIDTH = 800;
