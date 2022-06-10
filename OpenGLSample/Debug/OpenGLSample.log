@@ -1,0 +1,15 @@
+﻿  glad.c
+  shader.cpp
+  Source.cpp
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(185,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(354,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(355,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(359,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(360,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(362,14): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(363,14): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\OpenGLSample\Source.cpp(373,32): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
+  LINK : C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\Debug\OpenGLSample.exe not found or not built by the last incremental link; performing full link
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  OpenGLSample.vcxproj -> C:\Users\Gino\Projects\C++\OpenGL-Lighting-Demo\OpenGL-Lighting-Demo\Debug\OpenGLSample.exe
